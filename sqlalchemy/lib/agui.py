@@ -1,1 +1,2 @@
-
+def functest():
+  print("Yay")
