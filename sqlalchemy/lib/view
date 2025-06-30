@@ -1,0 +1,52 @@
+USE stomatology;
+
+CREATE VIEW PatientServices AS 
+SELECT 
+    p.id AS patient_id,  
+    p.fullname AS patient_name,  
+    COUNT(r.id) AS count_services 
+FROM patient p 
+LEFT JOIN reception r ON r.Patient_id = p.id 
+GROUP BY p.id, p.fullname;
+
+---
+
+USE books;
+
+CREATE VIEW AllBooksList AS
+SELECT b.name AS book_name, b.year, b.price, g.name AS genre_name FROM Book b
+JOIN Genre g ON b.Genre_id = g.id
+LEFT JOIN Sell s ON s.Book_id = b.id
+WHERE s.sell_date IS NULL
+
+---
+
+USE electronic_shop;
+
+CREATE VIEW OrderInfo AS
+SELECT p.name AS product_name, p.count, c.fullname, c.phone_number, c.email, s.name AS status_name, order_date FROM orders o
+JOIN Product p ON p.id = o.Product_id
+JOIN Client c ON c.id = o.Client_id
+JOIN Status s ON s.id = o.Status_id;
+
+---
+
+USE pet_shop;
+CREATE VIEW PetLust AS
+SELECT p.name AS pet_name, p.color, p.age, p.price, b.name AS breed_name, c.name AS cetegory_name FROM pet p
+LEFT JOIN Sell s ON p.id = s.Pet_id
+JOIN Breed b ON b.id = p.Breed_id
+JOIN Category c ON c.id = b.Category_id
+WHERE s.sell_date IS NULL
+ORDER BY cetegory_name, breed_name, pet_name;
+
+---
+
+USE school_lesson;
+CREATE VIEW TeachersRaspisanie AS
+SELECT t.fullname, s.name AS subject_name, d.name AS day_of_week, cl.name AS class_name, cab.number,  start_time, end_time, lesson_date FROM lesson l
+JOIN Teacher t ON t.id = l.Teacher_id
+JOIN Subject s ON s.id = l.Subject_id
+JOIN Day_week d ON d.id = l.day_week_id
+JOIN Class cl ON cl.id = l.Class_id
+JOIN Cabinet cab ON cab.id = l.Cabinet_id;
