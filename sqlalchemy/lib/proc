@@ -1,0 +1,147 @@
+USE tours;
+
+DELIMITER //
+CREATE PROCEDURE AddBronirovanie(
+IN p_Client_id INT,
+IN p_Manager_id INT,
+IN p_Tour_id INT)
+begin
+DECLARE record_count INT DEFAULT 0;
+
+START transaction;
+SELECT COUNT(*) INTO record_count FROM bronirovanie
+WHERE Client_id = p_Client_id AND Manager_id = p_Manager_id AND Tour_id = p_Tour_id;
+
+IF record_count = 0 THEN 
+INSERT INTO bronirovanie(id, Client_id, Manager_id, Tour_id) 
+VALUES (p_Client_id, p_Manager_id, p_Tour_id);
+commit;
+ELSE 
+ROLLBACK;
+SIGNAL SQLSTATE '45000'
+SET message_text = "Оибка запись уже существует";
+END IF;
+
+end //
+DELIMITER ;
+
+---
+
+USE pharmacy;
+
+DELIMITER //
+CREATE PROCEDURE AddSell(
+IN p_sell_date DATETIME,
+IN p_pharmacist_id INT,
+IN p_medicine_id INT)
+BEGIN
+DECLARE pharmacist_exists INT;
+START TRANSACTION;
+
+SELECT 1 INTO pharmacist_exists FROM pharmacist
+WHERE p_pharmacist_id = id;
+
+IF pharmacist_exists IS NOT NULL THEN
+INSERT INTO sell(sell_date, pharmacist_id, medicine_id)
+VALUES(p_sell_date, p_pharmacist_id, p_medicine_id);
+COMMIT;
+ELSE
+ROLLBACK;
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Фармацевт не существует';
+
+END IF;
+END //
+DELIMITER ;
+
+---
+
+USE books;
+
+DELIMITER //
+CREATE PROCEDURE AddSell(
+IN p_sell_date DATETIME,
+IN p_author_id INT,
+IN p_client_id INT,
+IN p_book_id INT,
+IN p_client_email VARCHAR(45))
+BEGIN
+DECLARE client_exists INT;
+DECLARE new_client_id INT;
+DECLARE vpyti_status INT;
+START TRANSACTION;
+
+SELECT id INTO vpyti_status FROM deliverystatus
+WHERE name = 'в пути';
+
+SELECT 1 INTO client_exists FROM Client 
+WHERE p_client_id = id;
+
+IF client_exists IS NULL THEN
+INSERT INTO client(id, email)
+VALUES(p_client_id, p_client_email);
+SET client_exists = 1;
+END IF;
+
+INSERT INTO sell(sell_date, Author_id, Client_id, Book_id, deliverystatus_id)
+VALUES(p_sell_date, p_author_id, p_client_id, p_book_id, vpyti_status);
+
+COMMIT;
+
+END //
+DELIMITER ;
+
+---
+
+USE pet_shop;
+
+DELIMITER //
+CREATE PROCEDURE AddSell(
+IN p_sell_date datetime,
+IN p_Pet_id int,
+IN p_Client_id int)
+BEGIN
+DECLARE status_name INT;
+START TRANSACTION;
+
+SELECT id INTO status_name FROM status
+WHERE name = 'в пути';
+
+INSERT INTO sell(sell_date, Pet_id, Client_id, Status_id)
+VALUES(p_sell_date, p_Pet_id, p_Client_id, status_name);
+
+COMMIT;
+END //
+DELIMITER ;
+
+---
+
+USE school_lesson;
+DELIMITER //
+CREATE PROCEDURE AddLesson(
+IN p_start_time time, 
+IN p_end_time time ,
+IN p_lesson_date date, 
+IN p_day_week_id int ,
+IN p_Class_id int ,
+IN p_Teacher_id int ,
+IN p_Subject_id int, 
+IN p_Cabinet_id int)
+BEGIN
+DECLARE lesson_mins INT;
+START TRANSACTION;
+
+SELECT TIMESTAMPDIFF(minute, p_start_time, p_end_time) INTO lesson_mins FROM lesson
+LIMIT 1;
+
+IF lesson_mins = 45 THEN
+INSERT INTO lesson(start_time, end_time, lesson_date, day_week_id, Class_id, Teacher_id, Subject_id, Cabinet_id)
+VALUES(p_start_time, p_end_time, p_lesson_date, p_day_week_id, p_Class_id, p_Teacher_id, p_Subject_id, p_Cabinet_id);
+COMMIT;
+ELSE
+ROLLBACK;
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Ошибка, длительность урока должна быть 45 минут';
+end IF;
+END //
+DELIMITER ;
