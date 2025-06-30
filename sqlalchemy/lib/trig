@@ -1,0 +1,101 @@
+USE school_lesson;
+
+DELIMITER //
+CREATE TRIGGER CheckAddLesson
+BEFORE INSERT ON lesson
+for each row
+BEGIN
+DECLARE lesson_exists INT;
+
+SELECT 1 INTO lesson_exists FROM lesson 
+WHERE NEW.Cabinet_id = Cabinet_id AND
+NEW.lesson_date = lesson_date AND
+(NEW.start_time = start_time OR NEW.end_time = end_time OR NEW.start_time BETWEEN start_time AND end_time OR NEW.end_time BETWEEN start_time AND end_time)
+LIMIT 1;
+
+IF lesson_exists IS NOT NULL THEN
+SIGNAl SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Урок пересекается с другим уроком';
+
+end IF;
+END //
+DELIMITER ;
+
+---
+
+USE pet_shop;
+
+DELIMITER //
+CREATE TRIGGER CheckStatus
+AFTER UPDATE ON sell
+FOR EACH ROW
+BEGIN
+DECLARE t_status_name VARCHAR(45);
+
+SELECT name INTO t_status_name FROM status
+WHERE NEW.Status_id = id;
+
+IF NEW.Status_id != OLD.Status_id AND t_status_name = 'получен' THEN
+INSERT INTO status_log(status_name, log_date, sell_id)
+VALUES(t_status_name, NOW(), NEW.id);
+
+END IF;
+END //
+DELIMITER ;
+
+---
+
+USE books;
+
+DELIMITER //
+CREATE TRIGGER SellStatusCheck
+AFTER UPDATE ON Sell
+FOR EACH ROW
+BEGIN
+DECLARE sell_id VARCHAR(45);
+DECLARE t_client VARCHAR(45);
+DECLARE author_fullname VARCHAR(45);
+DECLARE book_name VARCHAR(45);
+DECLARE t_status VARCHAR(45);
+
+SELECT id INTO sell_id FROM Sell s
+WHERE NEW.id = id;
+
+SELECT email INTO t_client FROM Client
+WHERE NEW.Client_id = id;
+
+SELECT name INTO book_name FROM Book
+WHERE NEW.Book_id = id;
+
+SELECT fullname INTO author_fullname FROM Author
+WHERE NEW.Author_id = id;
+
+IF NEW.DeliveryStatus_id = 1 THEN
+INSERT INTO deliverylog(Delivery_date, Client_email, book_name, book_author)
+VALUES(NOW(), t_client, book_name, author_fullname);
+
+END IF;
+END //
+DELIMITER ;
+
+---
+
+USE pharmacy;
+
+DELIMITER //
+CREATE TRIGGER EndDateCheck
+BEFORE INSERT ON Sell
+FOR EACH ROW
+BEGIN
+DECLARE p_end_date DATE;
+
+SELECT m.end_date INTO p_end_date FROM medicine m
+WHERE NEW.medicine_id = id;
+
+IF p_end_date < CURDATE() THEN
+SIGNAL SQLSTATE '45000'
+SET MESSAGE_TEXT = 'Срок годности истек';
+
+END IF;
+END //
+DELIMITER ;
