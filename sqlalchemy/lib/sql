@@ -1,1 +1,40 @@
-
+1. `SELECT * FROM table` – выбрать все данные из таблицы  
+2. `SELECT col1, col2 FROM table` – выбрать конкретные столбцы  
+3. `INSERT INTO table (col1, col2) VALUES (val1, val2)` – добавить запись  
+4. `UPDATE table SET col1 = val1 WHERE condition` – обновить данные  
+5. `DELETE FROM table WHERE condition` – удалить записи  
+6. `TRUNCATE TABLE table` – полностью очистить таблицу  
+7. `WHERE condition` – фильтрация строк (напр. `WHERE id = 5`)  
+8. `ORDER BY col1 ASC/DESC` – сортировка по столбцу  
+9. `LIMIT N` – ограничить количество результатов  
+10. `DISTINCT col1` – выбрать уникальные значения  
+11. `GROUP BY col1` – группировка данных  
+12. `HAVING condition` – фильтрация после GROUP BY  
+13. `COUNT(*)` – посчитать количество строк  
+14. `SUM(col1)` – сумма значений  
+15. `AVG(col1)` – среднее значение  
+16. `MAX(col1)/MIN(col1)` – максимальное/минимальное значение  
+17. `JOIN table2 ON table1.col = table2.col` – соединение таблиц  
+18. `INNER JOIN` – только совпадающие строки  
+19. `LEFT JOIN` – все строки из левой таблицы + совпадения  
+20. `RIGHT JOIN` – все строки из правой таблицы + совпадения  
+21. `CREATE TABLE table (col1 INT, col2 VARCHAR(50))` – создать таблицу  
+22. `ALTER TABLE table ADD COLUMN col3 INT` – добавить столбец  
+23. `DROP TABLE table` – удалить таблицу  
+24. `CREATE INDEX idx_name ON table(col1)` – создать индекс  
+25. `PRIMARY KEY (col1)` – задать первичный ключ  
+26. `FOREIGN KEY (col1) REFERENCES other_table(col2)` – внешний ключ  
+27. `LAST_INSERT_ID()` – получить последний автоинкрементный ID  
+28. `CONCAT(str1, str2)` – объединить строки  
+29. `NOW()` – текущая дата и время  
+30. `IFNULL(col, default_val)` – заменить NULL на значение  
+31. `CASE WHEN condition THEN val1 ELSE val2 END` – условная логика  
+32. `START TRANSACTION` – начать транзакцию  
+33. `COMMIT` – подтвердить изменения  
+34. `ROLLBACK` – откатить изменения  
+35. `UNION` – объединить результаты запросов (без дубликатов)  
+36. `UNION ALL` – объединить с дубликатами  
+37. `EXISTS (subquery)` – проверить существование записей  
+38. `WITH alias AS (subquery)` – временное представление (CTE)  
+39. `LIKE 'pattern'` – поиск по шаблону (`%` - любая строка, `_` - один символ)  
+40. `BETWEEN val1 AND val2` – значения в диапазоне  
